@@ -61,6 +61,6 @@ jobs:
           path: build
        
       - name: Deploy app build to S3 bucket
-        run: aws s3 sync . s3://react-deploy-bucket --acl public-read
+        run: aws s3 sync ./dist/ s3://react-deploy-bucket --delete
         working-directory: react-deploy-bucket-build 
-        # run: aws s3 sync ./dist/ s3://react-deploy-bucket --delete
+         
