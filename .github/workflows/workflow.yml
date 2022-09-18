@@ -35,32 +35,62 @@ on:
     branches:
       - master
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Install dependencies
-        run: npm install    
-      - name: Test
-        run: npm test
-        env:
-          CI: true
-      - name: Generate build
-        run: npm run build
-      - name: Share artifact inside workflow
-        uses: actions/upload-artifact@v1
-        with:
-          name: React-build
-          path: build
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+#       - name: Install dependencies
+#         run: npm install    
+#       - name: Test
+#         run: npm test
+#         env:
+#           CI: true
+#       - name: Generate build
+#         run: npm run build
+#       - name: Share artifact inside workflow
+#         uses: actions/upload-artifact@v1
+#         with:
+#           name: React-build
+#           path: build
        
-      - name: Deploy app build to S3 bucket
-        run: aws s3 sync ./dist/ s3://react-deploy-bucket --delete
+#       - name: Deploy app build to S3 bucket
+#         run: aws s3 sync ./dist/ s3://react-deploy-bucket --delete
       
          
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: setup node
+        uses: actions/setup-node@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Static File
+        run: npm build
+
+      - name: Test the app
+        run: npm run test
+
+      - name: Configure aws Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with: 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy static suite site  to s3 bucket
+        run: aws s3 sync ./build s3://react-deploy-bucket
+            
+        
