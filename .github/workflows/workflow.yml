@@ -78,10 +78,10 @@ jobs:
         run: npm install
 
       - name: Build Static File
-        run: npm build
+        run: npm run build
 
       - name: Test the app
-        run: npm run test
+        run: npm test
 
       - name: Configure aws Credentials
         uses: aws-actions/configure-aws-credentials@v1
